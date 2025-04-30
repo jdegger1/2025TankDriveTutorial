@@ -5,11 +5,27 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Subsystems.DriveTrainSubsystem;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
+/// We are creating a command that just tells the robot to drive at a certain speed
+/// This allows us to create an autonomous later
 public class AutoDriveCmd extends Command {
   /** Creates a new AutoDriveCmd. */
-  public AutoDriveCmd() {
+
+  private final DriveTrainSubsystem tankDrive;
+
+  /// Unlike the joystick command, we don't need suppliers as we pass in the speed and twist at the beginning of the command
+  private double speed;
+  private double twist;
+
+  public AutoDriveCmd(DriveTrainSubsystem tDrive, double speed, double twist) {
+
+    tankDrive = tDrive;
+
+    this.speed = speed;
+    this.twist = twist;
+
+    addRequirements(tankDrive);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -19,11 +35,16 @@ public class AutoDriveCmd extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    tankDrive.arcadeDrive(speed, twist);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    // we need the end method as we don't want our robot to keep driving during autonomous when we want it to stop
+    tankDrive.arcadeDrive(0, 0);
+  }
 
   // Returns true when the command should end.
   @Override
